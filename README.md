@@ -33,6 +33,11 @@ source /opt/ros/*/setup.bash
 rosdep install --from-path . -y -i
 ```
 
+```bash
+apt install python3-pip
+python3 -m pip install resolve_robotics_uri_py xacro
+```
+
 ### Convert XACRO to SDF
 
 ```bash
