@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools >= 64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "urdf-packager"
+description = "Script to package a robot model as a stand-alone archive."
+readme = "README.md"
+version = "0.0.1"
+license = {text = "GPLv3+"}
+dependencies = [
+  "argparse",
+  "copy",
+  "os",
+  "shutil",
+  "sys",
+  "tarfile",
+  "tempfile",
+  "xml",
+  "pathlib",
+  "resolve_robotics_uri_py",
+]
+requires-python = ">= 3.12"
+
+authors = [
+  {name = "Jeremie Deray", email = "jeremie.deray@canonical.com"},
+]
+maintainers = [
+  {name = "Jeremie Deray", email = "jeremie.deray@canonical.com"},
+]
+
+[project.urls]
+Repository = "https://github.com/ubuntu-robotics/snap_monitor_generator.git"
+Issues = "https://github.com/ubuntu-robotics/snap_monitor_generator/issues"
+
+[project.entry-points."console_scripts"]
+urdf-packager = "urdf-packager.main:main"
