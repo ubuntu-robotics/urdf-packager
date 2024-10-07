@@ -30,8 +30,8 @@ maintainers = [
 ]
 
 [project.urls]
-Repository = "https://github.com/ubuntu-robotics/snap_monitor_generator.git"
-Issues = "https://github.com/ubuntu-robotics/snap_monitor_generator/issues"
+Repository = "https://github.com/ubuntu-robotics/urdf-packager.git"
+Issues = "https://github.com/ubuntu-robotics/urdf-packager/issues"
 
 [project.entry-points."console_scripts"]
-urdf-packager = "urdf-packager.main:main"
+urdf-packager = "urdf_packager.main:main"
