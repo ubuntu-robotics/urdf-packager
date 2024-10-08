@@ -54,7 +54,9 @@ def find_and_resolve(tree, tag_name, package_dirs = None):
             files.append(absolute_path)
     return update, files
 
-def main(args):
+def main():
+    args = parse_arguments()
+
     check_file_exists(args.file)
 
     with tempfile.TemporaryDirectory() as tmp_dir_str:
@@ -79,5 +81,4 @@ def main(args):
 
 
 if __name__ == "__main__":
-    args = parse_arguments()
-    main(args)
+    main()
