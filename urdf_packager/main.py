@@ -37,7 +37,7 @@ def load_sdf_file(file_path):
         tree = ET.parse(file_path)
         return tree
     except ET.ParseError:
-        print(f"Error parsing XML file '{file_path}': Invalid XML")
+        print(f"Error parsing XML file '{file_path}': Invalid XML.")
         sys.exit(1)
     except Exception as e:
         print(f"Error loading XML file '{file_path}': {e}")
