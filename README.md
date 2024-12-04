@@ -6,19 +6,7 @@ A small util to turn a robot model into a single self-contained archive.
 
 ### Env setup
 
-Create a ROS 2 ready environment:
-
-```bash
-lxc launch ubuntu:22.04 urdf-exporter --config=user.user-data="$(curl -L https://gist.githubusercontent.com/artivis/1fcfcc38f1cb8c087e27ebda5484f2ef/raw/ros-bare.cloud-init.yaml)"
-```
-
-Shell inside the environment as the `ubuntu` user:
-
-```bash
-lxc exec urdf-exporter --mode interactive -- /bin/sh -xac $@ubuntu - exec /bin/login -p -f
-```
-
-Create a workspace and clone the project:
+Create a workspace and clone the project containing the robot model,
 
 ```bash
 mkdir -p ~/workspace/src
@@ -26,7 +14,7 @@ cd ~/workspace/src
 git clone https://github.com/ros-navigation/nav2_minimal_turtlebot_simulation.git
 ```
 
-Install the dependencies:
+Install the dependencies,
 
 ```bash
 source /opt/ros/*/setup.bash
