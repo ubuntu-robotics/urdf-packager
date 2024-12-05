@@ -1,0 +1,61 @@
+#!/usr/bin/bash
+
+if ! command -v lxc >/dev/null; then
+  echo "LXD must be installed to execute this script."
+  echo "Please run: snap install lxd && lxd init --minimal"
+  exit 1
+fi
+
+if [[ $# < 1  ]]; then
+  echo 'usage: urdf_packager_lxd rel/path/file.{sdf,xacro}'
+  exit 1
+fi
+
+MODEL_FILE="$1"
+MODEL_FILE_EXTENSION="${MODEL_FILE##*.}"
+
+LXC_IMAGE="24.04"
+LXC_NAME="urdf-exporter"
+
+LXC_HOME="/home/ubuntu"
+LXC_PROJECT_PATH="${LXC_HOME}/workspace/src"
+
+lxc launch ubuntu:${LXC_IMAGE} ${LXC_NAME} --config=user.user-data="$(curl -L https://gist.githubusercontent.com/artivis/1fcfcc38f1cb8c087e27ebda5484f2ef/raw/ros-bare.cloud-init.yaml)" --ephemeral
+
+# Wait for cloud-init to finish
+lxc exec ${LXC_NAME} -- cloud-init status --wait
+
+# Wait for the 'ubuntu' user
+until lxc exec ${LXC_NAME} -- getent passwd ubuntu; do
+  echo "Waiting for the ubuntu user."
+  sleep 0.25
+done
+
+# get folder name without full path
+PWD_DIRNAME=${PWD##*/}
+
+# Mount the project in the container
+lxc config device add ${LXC_NAME} robot-model disk source=${PWD} path=${LXC_PROJECT_PATH}/${PWD_DIRNAME}
+lxc config set ${LXC_NAME} raw.idmap "both $(id -u) $(id -g)"
+
+echo "Restarting container..."
+
+# restart lxc
+lxc restart ${LXC_NAME}
+
+# Wait for cloud-init to finish
+lxc exec ${LXC_NAME} -- cloud-init status --wait
+
+lxc exec ${LXC_NAME} -- source /opt/ros/*/setup.bash && rosdep install --from-path ${LXC_PROJECT_PATH}/${PWD_DIRNAME} -y -i
+lxc exec ${LXC_NAME} -- apt install -y python3-pip python3-venv
+lxc exec ${LXC_NAME} -- python3 -m pip install resolve_robotics_uri_py xacro
+
+lxc exec ${LXC_NAME} -- python3 -m pip install git+https://github.com/ubuntu-robotics/urdf-packager.git
+
+if [ ${MODEL_FILE_EXTENSION} == "xacro" ]; then
+  lxc exec ${LXC_NAME} -- xacro -o ${LXC_HOME}/output.sdf ${LXC_PROJECT_PATH}/${PWD_DIRNAME}/${MODEL_FILE}
+else
+  lxc exec ${LXC_NAME} -- ln -s ${LXC_PROJECT_PATH}/${PWD_DIRNAME}/${MODEL_FILE} ${LXC_HOME}/output.sdf
+fi
+
+lxc exec ${LXC_NAME} -- urdf-packager ${LXC_HOME}/output.sdf -p ${LXC_PROJECT_PATH}/${PWD_DIRNAME}
